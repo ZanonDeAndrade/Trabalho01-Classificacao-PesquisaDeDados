@@ -1,35 +1,36 @@
-import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
+import time
 
-url = 'https://store.epicgames.com/pt-BR/'
+# Configurando o WebDriver do Chrome com o WebDriver Manager (baixa automaticamente)
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 
-def buscar_dados(url):
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
+# Abrir o site da Epic Games
+url = "https://store.epicgames.com/pt-BR/browse?sortBy=releaseDate&sortDir=DESC&priceTier=tierDiscouted&category=Game&count=40"
+driver.get(url)
 
-    produtos = []
-    for item in soup.find_all('div', class_='nome_da_classe_do_produto'):
-        nome = item.find('h2').text
-        preco = item.find('span', class_='preco').text
-        produtos.append((nome, float(preco.replace('$', ''))))
-    
-    return produtos
+# Esperar um tempo para garantir que a página e o JavaScript tenham carregado
+time.sleep(5)
 
-def selection_sort(lista):
-    for i in range(len(lista)):
-        min_idx = i
-        for j in range(i+1, len(lista)):
-            if lista[j][1] < lista[min_idx][1]:
-                min_idx = j
-        lista[i], lista[min_idx] = lista[min_idx], lista[i]
-    return lista
+# Capturar o HTML da página carregada
+html = driver.page_source
 
-def main():
-    produtos = buscar_dados(url)
-    produtos_ordenados = selection_sort(produtos)
-    
-    for produto in produtos_ordenados:
-        print(f'{produto[0]}: ${produto[1]:.2f}')
+# Fechar o navegador
+driver.quit()
 
-if __name__ == "__main__":
-    main()
+# Usar BeautifulSoup para fazer o parsing do HTML
+soup = BeautifulSoup(html, 'html.parser')
+
+# Exemplo: Coletar nome e preço dos produtos (ajuste os seletores conforme necessário)
+produtos = []
+for item in soup.find_all('div', class_='css-1m0503p'):
+    nome_produto = item.find('span', class_='css-2ucwu').text.strip()
+    preco_produto = item.find('span', class_='css-1y1g2xn').text.strip().replace("R$", "").replace(",", ".")
+    if nome_produto and preco_produto:
+        produtos.append((nome_produto, float(preco_produto)))
+
+# Exibir os produtos coletados
+for produto in produtos:
+    print(f"Nome: {produto[0]}, Preço: R$ {produto[1]:.2f}")
