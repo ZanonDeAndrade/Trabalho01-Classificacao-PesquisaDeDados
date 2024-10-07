@@ -34,43 +34,35 @@ if dados:
         # Pega o texto do JSON encontrado
         dados_limpos = precos_json.group(0)
 
-        try:
-            # Converte o texto JSON em dicionário Python
-            precos_dicionario = json.loads(dados_limpos)
+     
+         # Converte o texto JSON em dicionário Python
+        precos_dicionario = json.loads(dados_limpos)
 
-            # Lista para armazenar preços
-            precos = []
+        # Lista para armazenar preços
+        precos = []
 
-            # Extrai os preços por moeda
-            for moeda in precos_dicionario['currencyList']:
-                for tier in moeda['tierList']:
-                    # Adiciona o preço à lista
-                    precos.append(float(tier['price']))
+        # Extrai os preços por moeda
+        for moeda in precos_dicionario['currencyList']:
+            for tier in moeda['tierList']:
+             # Adiciona o preço à lista
+                precos.append(float(tier['price']))
 
-            # Função para Selection Sort
-            def selection_sort(prices):
-                n = len(prices)
-                for i in range(n):
-                    min_index = i
-                    for j in range(i + 1, n):
-                        if prices[j] < prices[min_index]:
-                            min_index = j
-                    prices[i], prices[min_index] = prices[min_index], prices[i]
 
-            # Ordena os preços
-            selection_sort(precos)
+        def selection_sort(prices):
+            n = len(prices)
+            for i in range(n):
+                min_index = i
+                for j in range(i + 1, n):
+                    if prices[j] < prices[min_index]:
+                        min_index = j
+                prices[i], prices[min_index] = prices[min_index], prices[i]
 
-            # Exibe os preços ordenados
-            print("Preços ordenados:")
-            print(precos)
+        # Ordena os preços
+        selection_sort(precos)
 
-        except json.JSONDecodeError as e:
-            print(f"Erro ao decodificar JSON: {e}")
-            print(dados_limpos)  # Imprime o conteúdo capturado para ajudar no diagnóstico
-    else:
-        print("Não foi possível encontrar um bloco JSON válido contendo 'currencyList'.")
-else:
-    print("Script contendo os dados não encontrado.")
+      
+        print("Preços ordenados usando Selection Sort :")
+        print(precos)
 
-# Fecha o navegador
+
 driver.quit()
